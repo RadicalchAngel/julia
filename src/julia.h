@@ -513,7 +513,9 @@ typedef struct _jl_module_t {
     size_t primary_world;
     uint32_t counter;
     int32_t nospecialize;  // global bit flags: initialization for new methods
-    int32_t optlevel;
+    int8_t optlevel;
+    int8_t compile;
+    int8_t infer;
     uint8_t istopmod;
     jl_mutex_t lock;
 } jl_module_t;
@@ -1518,6 +1520,10 @@ JL_DLLEXPORT jl_module_t *jl_new_module(jl_sym_t *name);
 JL_DLLEXPORT void jl_set_module_nospecialize(jl_module_t *self, int on);
 JL_DLLEXPORT void jl_set_module_optlevel(jl_module_t *self, int lvl);
 JL_DLLEXPORT int jl_get_module_optlevel(jl_module_t *m);
+JL_DLLEXPORT void jl_set_module_compile(jl_module_t *self, int value);
+JL_DLLEXPORT int jl_get_module_compile(jl_module_t *m);
+JL_DLLEXPORT void jl_set_module_infer(jl_module_t *self, int value);
+JL_DLLEXPORT int jl_get_module_infer(jl_module_t *m);
 // get binding for reading
 JL_DLLEXPORT jl_binding_t *jl_get_binding(jl_module_t *m JL_PROPAGATES_ROOT, jl_sym_t *var);
 JL_DLLEXPORT jl_binding_t *jl_get_binding_or_error(jl_module_t *m, jl_sym_t *var);
@@ -2113,7 +2119,6 @@ typedef jl_value_t *(*jl_codeinstance_lookup_t)(jl_method_instance_t *mi JL_PROP
 typedef struct {
     int track_allocations;  // can we track allocations?
     int code_coverage;      // can we measure coverage?
-    int static_alloc;       // is the compiler allowed to allocate statically?
     int prefer_specsig;     // are specialized function signatures preferred?
 
     // controls the emission of debug-info. mirrors the clang options
